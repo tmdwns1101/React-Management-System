@@ -22,35 +22,25 @@ const styles = theme => ({
 })
 
 
-const customers = [{
-  'id' : 1,
-  'image' : 'https://placeimg.com/64/64/1',
-  'name' : '거북잉',
-  'number' : '20142187',
-  'sex' : 'Male',
-  'job' : 'student'
-  },
-  {
-    'id' : 2,
-    'image' : 'https://placeimg.com/64/64/2',
-    'name' : '토깽이',
-    'number' : '20142117',
-    'sex' : 'Male',
-    'job' : 'student'
-    },
-  {
-    'id' : 3,
-    'image' : 'https://placeimg.com/64/64/3',
-    'name' : '여우',
-    'number' : '20134187',
-    'sex' : 'Female',
-    'job' : 'student'
-    }
 
-]
 
 class App extends React.Component{
+
+  state = {
+    customers: ""
+  }
+
+  componentDidMount(){
+    this.callApi()
+      .then(res => this.setState({customers: res}))
+      .catch(err => console.log(err));
+  }
   
+  callApi = async () =>{
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  }
   render(){
     const { classes } = this.props;
     return (
@@ -68,7 +58,7 @@ class App extends React.Component{
           </TableHead>
           <TableBody>
           {
-            customers.map(customer =>{
+            this.state.customers ? this.state.customers.map(customer =>{
               return(
                 <Customer
                   key={customer.id}
@@ -80,7 +70,7 @@ class App extends React.Component{
                   job={customer.job}
                 />
               );
-            })
+            }) : ""
           }
           </TableBody>
         </Table>
