@@ -1,3 +1,4 @@
+const fs = require('fs');
 const express = require('express');
 const bodyParser = require('body-parser');
 const app = express();
@@ -11,42 +12,27 @@ app.get('/api/hello', (req, res) =>{
     res.send({message: 'Hello Express'});
 });
 
-app.get('/api/customers', (req, res)=>{
-    res.send([
-        {
-            'id' : 1,
-            'image' : 'https://placeimg.com/64/64/1',
-            'name' : '거북잉',
-            'number' : '20142187',
-            'sex' : 'Male',
-            'job' : 'student'
-            },
-            {
-              'id' : 2,
-              'image' : 'https://placeimg.com/64/64/2',
-              'name' : '토깽이',
-              'number' : '20142117',
-              'sex' : 'Male',
-              'job' : 'student'
-              },
-            {
-              'id' : 3,
-              'image' : 'https://placeimg.com/64/64/3',
-              'name' : '여우',
-              'number' : '20134187',
-              'sex' : 'Female',
-              'job' : 'student'
-              },
-            {
-                'id' : 4,
-                'image' : 'https://placeimg.com/64/64/4',
-                'name' : '사슴',
-                'number' : '20134337',
-                'sex' : 'Female',
-                'job' : 'student'
-            }
+const data = fs.readFileSync('./database.json');
+const conf = JSON.parse(data);ya
+const mysql = require('mysql');
 
-    ]);
+const connection = mysql.createConnection({
+    host: conf.host,
+    user: conf.user,
+    password: conf.password,
+    port: conf.port,
+    database: conf.database
+});
+
+connection.connect();
+
+app.get('/api/customers', (req, res)=>{
+    connection.query(
+        "SELECT * FROM CUSTOMER",
+        (err, rows, fields) => {
+            res.send(rows);
+        }
+    );
 });
 
 app.listen(port, ()=> console.log(`Listening on port ${port}`));

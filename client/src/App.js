@@ -1,5 +1,4 @@
 import React from 'react';
-import logo from './logo.svg';
 import './App.css';
 import Customer from './components/Customer';
 import Table from '@material-ui/core/Table';
@@ -9,15 +8,19 @@ import TableRow from '@material-ui/core/TableRow';
 import TableCell from '@material-ui/core/TableCell';
 import { withStyles } from '@material-ui/core/styles'
 import Paper from '@material-ui/core/Paper';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 const styles = theme => ({
   root:{
     width:'100%',
-    marginTop: theme.spacing.unit * 3,
+    marginTop: theme.spacing(3),
     overflowX : "auto"
   },
   table: {
     minWidth: 1080
+  },
+  progress :{
+    margin: theme.spacing(2)
   }
 })
 
@@ -27,13 +30,16 @@ const styles = theme => ({
 class App extends React.Component{
 
   state = {
-    customers: ""
+    customers: "",
+    completed: 0
   }
 
   componentDidMount(){
+    this.timer = setInterval(this.progress, 20);
     this.callApi()
       .then(res => this.setState({customers: res}))
       .catch(err => console.log(err));
+    
   }
   
   callApi = async () =>{
@@ -41,6 +47,12 @@ class App extends React.Component{
     const body = await response.json();
     return body;
   }
+
+  progress = () =>{
+    const completed = this.state.completed;
+    this.setState({completed : completed >= 100 ? 0 : completed + 1});
+  }
+
   render(){
     const { classes } = this.props;
     return (
@@ -70,7 +82,13 @@ class App extends React.Component{
                   job={customer.job}
                 />
               );
-            }) : ""
+            }) : 
+            <TableRow>
+              <TableCell colSpan="6" align="center">
+                <CircularProgress className={classes.progress} veriant="determinate" value={this.state.completed} />
+              </TableCell>
+            </TableRow>
+
           }
           </TableBody>
         </Table>
